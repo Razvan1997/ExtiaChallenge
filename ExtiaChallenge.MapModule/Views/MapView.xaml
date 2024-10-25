@@ -1,0 +1,72 @@
+﻿<UserControl x:Class="ExtiaChallenge.MapModule.Views.MapView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:converters="clr-namespace:ExtiaChallenge.MapModule.Converters"
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:ExtiaChallenge.MapModule.Views"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <converters:TextOffsetConverter x:Key="TextOffsetConverter" />
+    </UserControl.Resources>
+    <Grid RenderTransformOrigin="0.5,0.5">
+        <Grid.RenderTransform>
+            <TransformGroup>
+                <ScaleTransform x:Name="gridScaleTransform" ScaleX="1" ScaleY="1"/>
+                <TranslateTransform x:Name="imageTranslateTransform" X="0" Y="0"/>
+            </TransformGroup>
+        </Grid.RenderTransform>
+
+        <!-- Imaginea hartă -->
+        <Border BorderBrush="Gray" BorderThickness="1" ClipToBounds="True">
+            <Image Name="imgWorld" Source="{StaticResource worldDrawingImage}"/>
+        </Border>
+
+        <Canvas x:Name="mainCanvas" Width="800" Height="600">
+            <ItemsControl ItemsSource="{Binding Soldiers}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Canvas>
+                            <!-- Elipsa pentru soldat -->
+                            <Ellipse Width="{Binding EllipseSize}" Height="{Binding EllipseSize}" Fill="Orange"
+                                     Canvas.Left="{Binding Left}" Canvas.Top="{Binding Top}" >
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                                        <prism:InvokeCommandAction Command="{Binding DataContext.OnEllipseClickCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                   CommandParameter="{Binding}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                                <Ellipse.Triggers>
+                                    <EventTrigger RoutedEvent="Loaded">
+                                        <BeginStoryboard>
+                                            <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+                                                <DoubleAnimation
+                                                    Storyboard.TargetProperty="Opacity"
+                                                    From="1.0" To="0.0"
+                                                    Duration="0:0:1" />
+                                                <!-- 3 secunde pentru fade in/out -->
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </Ellipse.Triggers>
+                            </Ellipse>
+
+                            <!-- Textul sub elipsă -->
+                            <TextBlock Text="{Binding SoldierName}" Foreground="Black"
+                                       Canvas.Left="{Binding Left}" Canvas.Top="{Binding Top, Converter={StaticResource TextOffsetConverter}}"/>
+                        </Canvas>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Canvas>
+    </Grid>
+</UserControl>

@@ -1,0 +1,5 @@
+{
+  "ConnectionStrings": {
+    "ExtiaChallengeConnection": "Server=ExtiaChallenge;Database=ExtiaChallenge;Trusted_Connection=True;"
+  }
+}
